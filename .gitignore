@@ -55,3 +55,6 @@ docs/_build/
 
 # PyBuilder
 target/
+
+lagouweb/.idea/
+lagouweb/search/lagou_idx/
