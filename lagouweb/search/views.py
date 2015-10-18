@@ -2,8 +2,13 @@
 import os
 from django.shortcuts import render
 from django.conf import settings
+from jieba.analyse.analyzer import ChineseTokenizer
 from whoosh.index import open_dir
 from whoosh.qparser import MultifieldParser, QueryParser
+
+
+def build_query(query):
+    pass
 
 
 def index(request):
@@ -11,6 +16,12 @@ def index(request):
     print query
     if not query:
         return render(request, 'search/index.html', {})
+
+    t = ChineseTokenizer()
+    l = t(query)
+    q = [token.text for token in l]
+    q = u'(' + u' OR '.join(q) + u')'
+    print(q)
 
     idx_dir = os.path.join(settings.BASE_DIR, 'search/lagou_idx')
     ix = open_dir(idx_dir)
@@ -33,8 +44,6 @@ def index(request):
     total_pages = total / plen + (1 if total % plen else 0)
     page_start = max(1, page-2)
     page_end = min(total_pages, page_start+20)
-
-    print(xrange(page_start, page_end))
 
     pos_list = [{'id': hit['id'], 'name': hit['name'], 'com_name': hit['com_name']} for hit in results]
     return render(request, 'search/index.html',

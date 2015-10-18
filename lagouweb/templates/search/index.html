@@ -32,6 +32,7 @@
     <div id="search_result">
 
         {% if query %}
+        {% if pos_list %}
         <nav>
             <ul class="pagination">
                 <li class="{% if page <= 1 %}disabled{% endif %}">
@@ -48,19 +49,20 @@
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>
+                <li>
+                    <a href="#">{{ page }} of {{ total_pages }}</a>
+                </li>
             </ul>
         </nav>
 
         <div class="list-group">
 
-            {% if pos_list %}
-                {% for p in pos_list %}
-                <a href="http://www.lagou.com/jobs/{{ p.id }}.html?source=search" class="list-group-item">
-                    <h4 class="list-group-item-heading">{{ p.name }}</h4>
-                    <p class="list-group-item-text">{{ p.com_name }}</p>
-                </a>
-                {% endfor %}
-            {% endif %}
+            {% for p in pos_list %}
+            <a href="http://www.lagou.com/jobs/{{ p.id }}.html?source=search" class="list-group-item">
+                <h4 class="list-group-item-heading">{{ p.name }}</h4>
+                <p class="list-group-item-text">{{ p.com_name }}</p>
+            </a>
+            {% endfor %}
         </div>
 
         <nav>
@@ -79,8 +81,14 @@
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>
+                <li>
+                    <a href="#">{{ page }} of {{ total_pages }}</a>
+                </li>
             </ul>
         </nav>
+        {% else %}
+            <div>暂时没有符合该搜索条件的职位</div>
+        {% endif %}
         {% endif %}
     </div>
 
