@@ -13,22 +13,23 @@ def build_query(query):
 
 def index(request):
     query = request.GET.get('q', '')
-    print query
     if not query:
         return render(request, 'search/index.html', {})
 
     t = ChineseTokenizer()
     l = t(query)
     q = [token.text for token in l]
-    q = u'(' + u' OR '.join(q) + u')'
+    q = u' '.join(q)
     print(q)
 
     idx_dir = os.path.join(settings.BASE_DIR, 'search/lagou_idx')
     ix = open_dir(idx_dir)
     searcher = ix.searcher()
 
-    parser = QueryParser("name", schema=ix.schema)
-    q = parser.parse(query + u' city:上海')
+    parser = MultifieldParser(["name", "com_name", 'city'], schema=ix.schema)
+    q = parser.parse(q)
+    # TODO: print real parsed query object.
+    # print q
 
     page = 1
     if 'pn' in request.GET:
@@ -45,7 +46,10 @@ def index(request):
     page_start = max(1, page-2)
     page_end = min(total_pages, page_start+20)
 
-    pos_list = [{'id': hit['id'], 'name': hit['name'], 'com_name': hit['com_name']} for hit in results]
+    pos_list = [{'id': hit['id'], 'name': hit['name'], 'com_name': hit['com_name'],
+                 'salary': hit['salary'], 'education': hit['education'],
+                 'advantage': hit['advantage']}
+                for hit in results]
     return render(request, 'search/index.html',
                   {'pos_list': pos_list,
                    'query': query,
