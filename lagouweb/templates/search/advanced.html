@@ -8,7 +8,7 @@
 
 {% block body_block %}
 
-    <form id="search_form" role="form" method="get" action="{% url 'search.advanced' %}">
+    <form id="search_form" role="form" method="get" action=".">
 
         <div class="input-group">
             <input type="text" id="query" name="q" class="form-control"
@@ -19,6 +19,28 @@
                 <input type="submit" id="search_button" class="btn btn-default" value="搜索"/>
             </span>
         </div>
+
+        {% if cities %}
+        <nav>
+            <ul class="pagination">
+                <li><span><strong>城市：</strong></span></li>
+                {% for c in cities %}
+                    <li><a href="{% url 'search.advanced' %}?{{ c.query }}">{{ c.name }}</a> </li>
+                {% endfor %}
+            </ul>
+        </nav>
+        {% endif %}
+        {% if stages %}
+        <nav>
+            <ul class="pagination">
+                <li><span><strong>公司阶段：</strong></span></li>
+                {% for s in stages %}
+                    <li><a href="{% url 'search.advanced' %}?{{ s.query }}">{{ s.name }}</a> </li>
+                {% endfor %}
+            </ul>
+        </nav>
+        {% endif %}
+
         <br/>
 
     </form>
@@ -26,6 +48,7 @@
     <div id="search_result">
 
         {% if query %}
+
         {% if pos_list %}
         <nav>
             <ul class="pagination">
@@ -59,16 +82,17 @@
                 {% endfor %}
             </ul>
         </nav>
-{#        <nav>#}
-{#            <ul class="pagination">#}
-{#                {% if suggests %}#}
-{#                    <li><span>更多搜索：</span></li>#}
-{#                {% endif %}#}
-{#                {% for s in suggests %}#}
-{#                    <li><a href="{% url 'search.advanced' %}?q={{ s }}">{{ s }}</a> </li>#}
-{#                {% endfor %}#}
-{#            </ul>#}
-{#        </nav>#}
+
+        <nav>
+            <ul class="pagination">
+                {% if suggests %}
+                    <li><span>你是不是要找：</span></li>
+                {% endif %}
+                {% for s in suggests %}
+                    <li><a href="{% url 'search.advanced' %}?q={{ s }}">{{ s }}</a> </li>
+                {% endfor %}
+            </ul>
+        </nav>
 
         <div class="list-group">
 
@@ -103,7 +127,23 @@
             </ul>
         </nav>
         {% else %}
-            <div>暂时没有符合该搜索条件的职位</div>
+
+            <div class="alert alert-warning alert-dismissible" role="alert">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              暂时没有符合该搜索条件的职位
+            </div>
+
+            <nav>
+            <ul class="pagination">
+                {% if suggests %}
+                    <li><span>你是不是要找：</span></li>
+                {% endif %}
+                {% for s in suggests %}
+                    <li><a href="{% url 'search.advanced' %}?q={{ s }}">{{ s }}</a> </li>
+                {% endfor %}
+            </ul>
+        </nav>
+
         {% endif %}
         {% endif %}
     </div>

@@ -11,9 +11,10 @@ from whoosh.qparser import MultifieldParser, QueryParser
 jieba.add_word(u'机器学习')
 jieba.add_word(u'自然语言处理')
 
+cities = [u'不限', u'北京', u'上海', u'深圳', u'广州', u'杭州', u'南京', u'成都', u'武汉', u'西安', u'厦门', u'苏州', u'天津']
+stages = [u'不限', u'初创型', u'成长型', u'成熟型', u'已上市']
 
-def build_query(query):
-    pass
+void_query = u'不限'
 
 
 def get_tokenized_query(query):
@@ -53,8 +54,8 @@ def index(request):
     # got = results.scored_length()
 
     total_pages = total / plen + (1 if total % plen else 0)
-    page_start = max(1, page-2)
-    page_end = min(total_pages, page_start+20)
+    page_start = max(1, page - 2)
+    page_end = min(total_pages, page_start + 20)
 
     pos_list = [{'id': hit['id'], 'name': hit['name'], 'com_name': hit['com_name'],
                  'salary': hit['salary'], 'education': hit['education'],
@@ -63,17 +64,42 @@ def index(request):
     return render(request, 'search/index.html',
                   {'pos_list': pos_list,
                    'query': query,
-                   'page': page, 'plen': plen, 'total_pages': total_pages, 'pages': xrange(page_start, page_end+1),
-                   'prev': page-1 if page > 1 else 1, 'next': page+1 if page < total_pages else total_pages})
+                   'page': page, 'plen': plen, 'total_pages': total_pages, 'pages': xrange(page_start, page_end + 1),
+                   'prev': page - 1 if page > 1 else 1, 'next': page + 1 if page < total_pages else total_pages})
+
+
+def rebuild_querystring(dict_, key, value):
+    dict_[key] = value
+    return dict_.urlencode()
 
 
 def advanced(request):
 
-    query = request.GET.get('q', '')
-    if not query:
-        return render(request, 'search/advanced.html', {})
+    query = request.GET.get('q', None)
+    city = request.GET.get('city', None)
+    stage = request.GET.get('stage', None)
 
-    qtext = get_tokenized_query(query) + u' 上海'
+    dict_ = request.GET.copy()
+    city_list = [{'name': c, 'query': rebuild_querystring(dict_, 'city', c)} for c in cities]
+    print city_list
+
+    dict_ = request.GET.copy()
+    stage_list = [{'name': s, 'query': rebuild_querystring(dict_, 'stage', s)} for s in stages]
+
+    if not query:
+        return render(request, 'search/advanced.html',
+                      {'city': city,
+                       'state': stage,
+                       'cities': city_list,
+                       'stages': stage_list})
+
+    if not city:
+        city = u'上海'
+    qtext = get_tokenized_query(query)
+    if city != void_query:
+        qtext = qtext + u' city:' + city
+    if stage and stage != void_query:
+        qtext = qtext + u' fin_stage:' + stage
     print qtext
 
     idx_dir = os.path.join(settings.BASE_DIR, 'search/lagou_idx')
@@ -94,11 +120,9 @@ def advanced(request):
     results = searcher.search_page(q, page, pagelen=plen)
 
     total = len(results)
-    # got = results.scored_length()
-
     total_pages = total / plen + (1 if total % plen else 0)
-    page_start = max(1, page-2)
-    page_end = min(total_pages, page_start+20)
+    page_start = max(1, page - 2)
+    page_end = min(total_pages, page_start + 20)
 
     pos_list = [{'id': hit['id'], 'name': hit['name'], 'com_name': hit['com_name'],
                  'salary': hit['salary'], 'education': hit['education'],
@@ -108,18 +132,25 @@ def advanced(request):
     docnums = [hit.docnum for hit in results]
     keywords = [kw for kw, score in searcher.key_terms(docnums, 'desc', numterms=10) if kw not in qtext]
 
-    # corrector = searcher.corrector('desc')
-    # suggests = corrector.suggest(query)
+    suggests = []
+    if len(results) < plen:
+        print 'find suggests'
+        corrector = searcher.corrector('desc')
+        suggests = corrector.suggest(query)
 
     searcher.close()
 
     return render(request, 'search/advanced.html',
                   {'pos_list': pos_list,
                    'query': query,
+                   'city': city,
+                   'stage': stage,
                    'keywords': keywords,
-                   # 'suggests': suggests,
-                   'page': page, 'plen': plen, 'total_pages': total_pages, 'pages': xrange(page_start, page_end+1),
-                   'prev': page-1 if page > 1 else 1, 'next': page+1 if page < total_pages else total_pages})
+                   'suggests': suggests,
+                   'cities': city_list,
+                   'stages': stage_list,
+                   'page': page, 'plen': plen, 'total_pages': total_pages, 'pages': xrange(page_start, page_end + 1),
+                   'prev': page - 1 if page > 1 else 1, 'next': page + 1 if page < total_pages else total_pages})
 
 
 def stats(request):
