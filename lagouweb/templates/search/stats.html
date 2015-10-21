@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
+{% load search_extras %}
 
 {% block title %}Statistics{% endblock %}
 
@@ -8,7 +9,10 @@
 {% endblock %}
 
 {% block body_block %}
-<div>
-    <img width="750" height="500" src="{% static "images/mountains2.jpg" %}" alt="Picture of Lagou Searcher" />
-</div>
+    <div>Today is {% now 'm/d/Y' %}.</div>
+
+    <div>
+        <img width="750" height="500" src="{% static "images/mountains2.jpg" %}" alt="Picture of Lagou Searcher" />
+    </div>
+
 {% endblock %}

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load staticfiles %}
+{% load search_extras %}
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -51,13 +52,7 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
-            {% block side_block %}
-                <ul class="nav nav-sidebar">
-                    <li><a href="{% url 'search.index' %}">Quick Search</a></li>
-                    <li><a href="{% url 'search.advanced' %}">Advanced Search</a></li>
-                    <li><a href="{% url 'search.stats' %}">Statistics</a></li>
-                </ul>
-            {% endblock %}
+            {% get_side_bar page_name %}
 
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">

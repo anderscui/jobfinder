@@ -29,7 +29,7 @@ def get_tokenized_query(query):
 def index(request):
     query = request.GET.get('q', '')
     if not query:
-        return render(request, 'search/index.html', {})
+        return render(request, 'search/index.html', {'page_name': 'search.index'})
 
     qtext = get_tokenized_query(query)
 
@@ -62,7 +62,8 @@ def index(request):
                  'advantage': hit['advantage']}
                 for hit in results]
     return render(request, 'search/index.html',
-                  {'pos_list': pos_list,
+                  {'page_name': 'search.index',
+                   'pos_list': pos_list,
                    'query': query,
                    'page': page, 'plen': plen, 'total_pages': total_pages, 'pages': xrange(page_start, page_end + 1),
                    'prev': page - 1 if page > 1 else 1, 'next': page + 1 if page < total_pages else total_pages})
@@ -79,19 +80,11 @@ def advanced(request):
     city = request.GET.get('city', None)
     stage = request.GET.get('stage', None)
 
-    dict_ = request.GET.copy()
-    city_list = [{'name': c, 'query': rebuild_querystring(dict_, 'city', c)} for c in cities]
-    print city_list
-
-    dict_ = request.GET.copy()
-    stage_list = [{'name': s, 'query': rebuild_querystring(dict_, 'stage', s)} for s in stages]
-
     if not query:
         return render(request, 'search/advanced.html',
-                      {'city': city,
-                       'state': stage,
-                       'cities': city_list,
-                       'stages': stage_list})
+                      {'page_name': 'search.advanced',
+                       'cities': cities,
+                       'stages': stages})
 
     if not city:
         city = u'上海'
@@ -140,18 +133,19 @@ def advanced(request):
 
     searcher.close()
 
+    print len(pos_list)
+
     return render(request, 'search/advanced.html',
-                  {'pos_list': pos_list,
+                  {'page_name': 'search.advanced',
                    'query': query,
-                   'city': city,
-                   'stage': stage,
+                   'pos_list': pos_list,
                    'keywords': keywords,
                    'suggests': suggests,
-                   'cities': city_list,
-                   'stages': stage_list,
+                   'cities': cities,
+                   'stages': stages,
                    'page': page, 'plen': plen, 'total_pages': total_pages, 'pages': xrange(page_start, page_end + 1),
                    'prev': page - 1 if page > 1 else 1, 'next': page + 1 if page < total_pages else total_pages})
 
 
 def stats(request):
-    return render(request, 'search/stats.html')
+    return render(request, 'search/stats.html', {'page_name': 'search.stats'})

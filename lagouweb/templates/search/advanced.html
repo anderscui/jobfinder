@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
+{% load search_extras %}
 
 {% block title %}Advanced Search{% endblock %}
 
@@ -8,11 +9,14 @@
 
 {% block body_block %}
 
-    <form id="search_form" role="form" method="get" action=".">
+    <form id="search_form" role="form" method="get" action="{% url 'search.advanced' %}">
+
+        <input type="hidden" id="city" name="city" value="{% query_str 'city' %}" />
+        <input type="hidden" id="stage" name="stage" value="{% query_str 'stage' %}" />
 
         <div class="input-group">
             <input type="text" id="query" name="q" class="form-control"
-                   placeholder="请输入职位名称或公司名称" value="{{ query }}" autocomplete="on"
+                   placeholder="请输入职位名称或公司名称" value="{% query_str 'q' %}" autocomplete="on"
                    maxlength="64" tabindex="1" width="570px"/>
 
             <span class="input-group-btn">
@@ -25,7 +29,7 @@
             <ul class="pagination">
                 <li><span><strong>城市：</strong></span></li>
                 {% for c in cities %}
-                    <li><a href="{% url 'search.advanced' %}?{{ c.query }}">{{ c.name }}</a> </li>
+                    <li><a href="{% url 'search.advanced' %}?{% replace_query_str 'city' c %}">{{ c }}</a> </li>
                 {% endfor %}
             </ul>
         </nav>
@@ -35,7 +39,7 @@
             <ul class="pagination">
                 <li><span><strong>公司阶段：</strong></span></li>
                 {% for s in stages %}
-                    <li><a href="{% url 'search.advanced' %}?{{ s.query }}">{{ s.name }}</a> </li>
+                    <li><a href="{% url 'search.advanced' %}?{% replace_query_str 'stage' s %}">{{ s }}</a> </li>
                 {% endfor %}
             </ul>
         </nav>
