@@ -8,13 +8,16 @@ from whoosh.index import open_dir
 from whoosh.qparser import MultifieldParser, QueryParser
 
 
-jieba.add_word(u'机器学习')
-jieba.add_word(u'自然语言处理')
+# jieba.add_word(u'机器学习')
+# jieba.add_word(u'自然语言处理')
 
 cities = [u'不限', u'北京', u'上海', u'深圳', u'广州', u'杭州', u'南京', u'成都', u'武汉', u'西安', u'厦门', u'苏州', u'天津']
 stages = [u'不限', u'初创型', u'成长型', u'成熟型', u'已上市']
 
 void_query = u'不限'
+
+# salary str: u'10k以下', u'10k以上', '10k-15k'
+# -> (0-10000), (10000-100000000), (10000-15000)
 
 
 def get_tokenized_query(query):
@@ -32,6 +35,7 @@ def index(request):
         return render(request, 'search/index.html', {'page_name': 'search.index'})
 
     qtext = get_tokenized_query(query)
+    print qtext
 
     idx_dir = os.path.join(settings.BASE_DIR, 'search/lagou_idx')
     ix = open_dir(idx_dir)
@@ -99,7 +103,7 @@ def advanced(request):
     ix = open_dir(idx_dir)
     searcher = ix.searcher()
 
-    parser = MultifieldParser(["name", "com_name", 'city', 'desc'], schema=ix.schema)
+    parser = MultifieldParser(["name", "com_name"], schema=ix.schema)
     q = parser.parse(qtext)
     # TODO: print real parsed query object.
     # print q
