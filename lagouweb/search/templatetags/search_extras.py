@@ -26,6 +26,7 @@ def query_str(context, key):
 
 side_pages = [(u'Quick Search', 'search.index'),
               (u'Advanced Search', 'search.advanced'),
+              (u'Keywords', 'search.keywords'),
               (u'Statistics', 'search.stats'),
               ]
 

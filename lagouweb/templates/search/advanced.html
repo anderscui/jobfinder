@@ -34,6 +34,26 @@
             </ul>
         </nav>
         {% endif %}
+        {% if salaries %}
+        <nav>
+            <ul class="pagination">
+                <li><span><strong>月薪：</strong></span></li>
+                {% for s in salaries %}
+                    <li><a href="{% url 'search.advanced' %}?{% replace_query_str 'salary' s %}">{{ s }}</a> </li>
+                {% endfor %}
+            </ul>
+        </nav>
+        {% endif %}
+        {% if dates %}
+        <nav>
+            <ul class="pagination">
+                <li><span><strong>日期：</strong></span></li>
+                {% for d in dates %}
+                    <li><a href="{% url 'search.advanced' %}?{% replace_query_str 'date' d %}">{{ d }}</a> </li>
+                {% endfor %}
+            </ul>
+        </nav>
+        {% endif %}
         {% if stages %}
         <nav>
             <ul class="pagination">

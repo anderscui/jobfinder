@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}Quick Search{% endblock %}
+
+{% block page_header %}
+{% endblock %}
+
+{% block body_block %}
+
+    <form id="search_form" role="form" method="get" action="{% url 'search.keywords' %}">
+
+        <div class="input-group">
+            <input type="text" id="query" name="q" class="form-control"
+                   placeholder="请输入职位名称或公司名称" value="{{ query }}" autocomplete="on"
+                   maxlength="64" tabindex="1" width="570px"/>
+
+            <span class="input-group-btn">
+                <input type="submit" id="search_button" class="btn btn-default" value="搜索"/>
+            </span>
+        </div>
+        <br/>
+
+    </form>
+
+    <div id="search_result">
+
+        {% if query %}
+            {% if keywords %}
+                <div class="alert alert-success" role="alert">搜索到{{ total }}工作，从其中的{{ got }}个中查找出到如下
+                    {{ keywords|length }}个关键字：</div>
+                {% for kw in keywords %}
+                    <li>{{ kw.0 }}</li>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-warning" role="alert">未找到相关的关键字，请尝试一下其它搜索。</div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+{% endblock %}
