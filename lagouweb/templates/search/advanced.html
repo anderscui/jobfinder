@@ -11,8 +11,10 @@
 
     <form id="search_form" role="form" method="get" action="{% url 'search.advanced' %}">
 
-        <input type="hidden" id="city" name="city" value="{% query_str 'city' %}" />
-        <input type="hidden" id="stage" name="stage" value="{% query_str 'stage' %}" />
+        <input type="hidden" id="city" name="city" value="{{ city }}" />
+        <input type="hidden" id="stage" name="stage" value="{{ stage }}" />
+        <input type="hidden" id="salary" name="salary" value="{{ salary }}" />
+        <input type="hidden" id="date" name="date" value="{{ date }}" />
 
         <div class="input-group">
             <input type="text" id="query" name="q" class="form-control"
@@ -29,7 +31,7 @@
             <ul class="pagination">
                 <li><span><strong>城市：</strong></span></li>
                 {% for c in cities %}
-                    <li><a href="{% url 'search.advanced' %}?{% replace_query_str 'city' c %}">{{ c }}</a> </li>
+                    <li class="{% if city == c %}active{% endif %}"><a href="{% url 'search.advanced' %}?{% replace_query_str 'city' c %}">{{ c }}</a> </li>
                 {% endfor %}
             </ul>
         </nav>
@@ -39,7 +41,7 @@
             <ul class="pagination">
                 <li><span><strong>月薪：</strong></span></li>
                 {% for s in salaries %}
-                    <li><a href="{% url 'search.advanced' %}?{% replace_query_str 'salary' s %}">{{ s }}</a> </li>
+                    <li class="{% if salary == s %}active{% endif %}"><a href="{% url 'search.advanced' %}?{% replace_query_str 'salary' s %}">{{ s }}</a> </li>
                 {% endfor %}
             </ul>
         </nav>
@@ -49,7 +51,7 @@
             <ul class="pagination">
                 <li><span><strong>日期：</strong></span></li>
                 {% for d in dates %}
-                    <li><a href="{% url 'search.advanced' %}?{% replace_query_str 'date' d %}">{{ d }}</a> </li>
+                    <li class="{% if date == d %}active{% endif %}"><a href="{% url 'search.advanced' %}?{% replace_query_str 'date' d %}">{{ d }}</a> </li>
                 {% endfor %}
             </ul>
         </nav>
@@ -59,7 +61,7 @@
             <ul class="pagination">
                 <li><span><strong>公司阶段：</strong></span></li>
                 {% for s in stages %}
-                    <li><a href="{% url 'search.advanced' %}?{% replace_query_str 'stage' s %}">{{ s }}</a> </li>
+                    <li class="{% if stage == s %}active{% endif %}"><a href="{% url 'search.advanced' %}?{% replace_query_str 'stage' s %}">{{ s }}</a> </li>
                 {% endfor %}
             </ul>
         </nav>

@@ -16,7 +16,6 @@ from whoosh.qparser import MultifieldParser, QueryParser
 cities = [u'不限', u'北京', u'上海', u'深圳', u'广州', u'杭州', u'南京', u'成都', u'武汉', u'西安', u'厦门', u'苏州', u'天津']
 stages = [u'不限', u'初创型', u'成长型', u'成熟型', u'已上市']
 salaries = [u'不限', u'5k以下', u'5k-10k', u'10k-15k', u'15k-25k', u'25k-50k', u'50k以上']
-# dates = {u'不限': 0, u'三天内': 3, u'一周内': 7, u'两周内': 14, u'一月内': 30}
 dates_keys = [u'不限', u'三天内', u'一周内', u'两周内', u'一月内']
 dates_vals = [0, 3, 7, 14, 30]
 
@@ -51,7 +50,7 @@ def parse_date(days):
         return None
 
     i = dates_keys.index(days)
-    delta = dates_vals[i]-1
+    delta = dates_vals[i] - 1
     if delta <= 0:
         return None
 
@@ -77,7 +76,7 @@ def index(request):
     qtext = get_tokenized_query(query)
     print qtext
 
-    idx_dir = os.path.join(settings.BASE_DIR, 'search/lagou_idx')
+    idx_dir = os.path.join(settings.BASE_DIR, 'search/lagou_idx_quick')
     ix = open_dir(idx_dir)
     searcher = ix.searcher()
 
@@ -114,16 +113,23 @@ def index(request):
 
 
 def advanced(request):
+    query = request.GET.get('q', '')
+    city = request.GET.get('city', u'上海')
+    stage = request.GET.get('stage', '')
 
-    query = request.GET.get('q', None)
-    city = request.GET.get('city', None)
-    stage = request.GET.get('stage', None)
-    salary_range = parse_salary(request.GET.get('salary', ''))
-    date_range = parse_date(request.GET.get('date', ''))
+    salary = request.GET.get('salary', '')
+    salary_range = parse_salary(salary)
+
+    date = request.GET.get('date', '')
+    date_range = parse_date(date)
 
     if not query:
         return render(request, 'search/advanced.html',
                       {'page_name': 'search.advanced',
+                       'city': city,
+                       'stage': stage,
+                       'salary': salary,
+                       'date': date,
                        'cities': cities,
                        'stages': stages,
                        'salaries': salaries,
@@ -183,6 +189,10 @@ def advanced(request):
     return render(request, 'search/advanced.html',
                   {'page_name': 'search.advanced',
                    'query': query,
+                   'city': city,
+                   'stage': stage,
+                   'salary': salary,
+                   'date': date,
                    'pos_list': pos_list,
                    'keywords': keywords,
                    'suggests': suggests,
@@ -228,7 +238,7 @@ def keywords(request):
                    'total': total,
                    'got': got,
                    'keywords': keywords,
-                   })
+                  })
 
 
 def stats(request):
